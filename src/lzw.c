@@ -4,8 +4,10 @@
 
 #define CODE_LENGTH 12
 #define DICT_SIZE (1 << CODE_LENGTH)
+#define DEBUG
 
 int16_t** dict;
+short word_len = 8;
 
 void dict_init(){
 	int i;
@@ -40,8 +42,46 @@ void dict_free(){
 	free(dict);
 }
 
+void print_code(int16_t code){
+	static uint8_t tail = 0, tail_len = 0;
+	int cur_left = word_len;
+	uint8_t tempbyte;
+	
+	if(tail_len != 0){
+		tempbyte = tail << (8 - tail_len);
+		tempbyte |= (uint8_t)(code >> (word_len - tail_len));
+		putchar(tempbyte);
+		cur_left -= tail_len;
+		if(cur_left < 8){
+			tail_len = cur_left;
+			tail = (uint8_t)(code >> (8 - tail_len));
+			return;
+		}
+		else{
+			tail_len = cur_left - 8;
+			putchar((uint8_t)(code >> tail_len));
+			tail = (((uint8_t)code) << (8 - tail_len)) >> tail_len;
+			return;
+		}
+	}
+	else{
+		putchar( (uint8_t)(code >> (word_len - 8)) );
+		tail_len = word_len - 8;
+		if(word_len > 8){
+			tail = (uint8_t)(code >> (word_len - 8));
+		}
+	}
+}
+
 int main(int argc, char** argv){
+// 	int prevchar, nextchar;
+	
 	dict_init();
+	
+// 	prevchar = getchar();
+// 	while((nextchar = getchar()) != EOF){
+// 		
+// 	}
 	
 	dict_free();
 	return 0;
