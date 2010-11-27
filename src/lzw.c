@@ -1,48 +1,8 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
+#define MAIN
 
-#define CODE_LENGTH 12
-#define DICT_SIZE (1 << CODE_LENGTH)
-#define DEBUG
+#include "common.h"
 
-int16_t** dict;
-int dict_new = 256;
-short word_len = 8;
 uint8_t tail = 0, tail_len = 0;
-
-void dict_init(){
-	int i;
-
-	dict = malloc(sizeof(int16_t*) * DICT_SIZE);
-	if(dict == NULL){
-		fprintf(stderr, "Memory allocation error\n");
-		exit(1);
-	}
-
-	for(i = 0; i < 256; i++){
-		dict[i] = malloc(sizeof(int16_t) * 2);
-		if(dict[i] == NULL){
-			fprintf(stderr, "Memory allocation error\n");
-			exit(1);
-		}
-		dict[i][0] = i;
-		dict[i][1] = -1;
-	}
-
-	for(i = 256; i < DICT_SIZE; i++){
-		dict[i] = NULL;
-	}
-}
-
-void dict_free(){
-	int i;
-
-	for(i = 0; i < DICT_SIZE; i++){
-		free(dict[i]);
-	}
-	free(dict);
-}
 
 void print_code(int16_t code){
 	int cur_left = word_len, i;
