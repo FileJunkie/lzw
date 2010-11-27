@@ -1,1 +1,4 @@
 Custom LZW implementation. University task.
+
+usage:
+./lzw < inputfile > outputfile 

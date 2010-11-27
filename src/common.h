@@ -20,5 +20,6 @@ extern short word_len;
 
 void dict_init();
 void dict_free();
+void dict_add(int16_t, int16_t);
 
 #endif

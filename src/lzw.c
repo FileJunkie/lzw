@@ -8,11 +8,6 @@ void print_code(int16_t code){
 	int cur_left = word_len, i;
 	uint8_t tempbyte;
 
-
-	for(i = 0; i < 16 - word_len; i++){
-		code &= ~(1 << (16 - i - 1));
-	}
-
 	if(tail_len != 0){
 		tempbyte = tail << (8 - tail_len);
 		tempbyte |= (uint8_t)(code >> (word_len - 8 + tail_len));
@@ -20,7 +15,10 @@ void print_code(int16_t code){
 		cur_left -= 8 - tail_len;
 		if(cur_left < 8){
 			tail_len = cur_left;
-			tail = (uint8_t)(code >> (word_len - tail_len));
+			for(i = 0; i < 16 - tail_len; i++){
+				code &= ~(1 << (16 - i - 1));
+			}
+			tail = (uint8_t)(code);
 			return;
 		}
 		else{
@@ -34,10 +32,14 @@ void print_code(int16_t code){
 		}
 	}
 	else{
-		putchar( (uint8_t)(code >> (word_len - 8)) );
+		tempbyte = (uint8_t)(code >> (word_len - 8));
+		putchar(tempbyte);
 		tail_len = word_len - 8;
 		if(word_len > 8){
-			tail = (uint8_t)(code >> (word_len - tail_len));
+			for(i = 0; i < word_len - tail_len; i++){
+				code &= ~(1 << (word_len - i - 1));
+			}
+			tail = (uint8_t)(code);
 		}
 	}
 }
@@ -56,25 +58,6 @@ int dict_search(int16_t c1, int16_t c2){
 	}
 
 	return -1;
-}
-
-void dict_add(int16_t c1, int16_t c2){
-	if(dict_new >= DICT_SIZE){
-		return;
-	}
-
-	dict[dict_new] = malloc(sizeof(int16_t) * 2);
-	if(dict[dict_new] == NULL){
-		fprintf(stderr, "Memory allocation error\n");
-		exit(1);
-	}
-	dict[dict_new][0] = c1;
-	dict[dict_new][1] = c2;
-
-	if((dict_new & (dict_new -1)) == 0){
-		word_len++;
-	}
-	dict_new++;
 }
 
 int main(int argc, char** argv){
