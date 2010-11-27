@@ -7,6 +7,7 @@
 #define DEBUG
 
 int16_t** dict;
+int dict_new = 256;
 short word_len = 8;
 uint8_t tail = 0, tail_len = 0;
 
@@ -85,15 +86,27 @@ void print_tail_finalize(){
 	putchar(tail << (8 - tail_len));
 }
 
+int dict_search(int16_t c1, int16_t c2){
+	int i;
+
+	for(i = 0; i < dict_new; i++){
+		if(dict[i][0] == c1 && dict[i][1] == c2){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 int main(int argc, char** argv){
-// 	int prevchar, nextchar;
+ 	int16_t prevchar, nextchar;
 
 	dict_init();
 
-// 	prevchar = getchar();
-// 	while((nextchar = getchar()) != EOF){
-//
-// 	}
+ 	prevchar = getchar();
+ 	while((nextchar = getchar()) != EOF){
+
+ 	}
 
 	dict_free();
 	return 0;
