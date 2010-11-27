@@ -8,6 +8,7 @@
 
 int16_t** dict;
 short word_len = 8;
+uint8_t tail = 0, tail_len = 0;
 
 void dict_init(){
 	int i;
@@ -43,9 +44,9 @@ void dict_free(){
 }
 
 void print_code(int16_t code){
-	static uint8_t tail = 0, tail_len = 0;
 	int cur_left = word_len, i;
 	uint8_t tempbyte;
+
 
 	for(i = 0; i < 16 - word_len; i++){
 		code &= ~(1 << (16 - i - 1));
@@ -78,6 +79,10 @@ void print_code(int16_t code){
 			tail = (uint8_t)(code >> (word_len - tail_len));
 		}
 	}
+}
+
+void print_tail_finalize(){
+	putchar(tail << (8 - tail_len));
 }
 
 int main(int argc, char** argv){
