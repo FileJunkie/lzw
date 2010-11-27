@@ -98,6 +98,25 @@ int dict_search(int16_t c1, int16_t c2){
 	return -1;
 }
 
+void dict_add(int16_t c1, int16_t c2){
+	if(dict_new >= DICT_SIZE){
+		return;
+	}
+
+	dict[dict_new] = malloc(sizeof(int16_t) * 2);
+	if(dict[dict_new] == NULL){
+		fprintf(stderr, "Memory allocation error\n");
+		exit(1);
+	}
+	dict[dict_new][0] = c1;
+	dict[dict_new][1] = c2;
+
+	if((dict_new & (dict_new -1)) == 0){
+		word_len++;
+	}
+	dict_new++;
+}
+
 int main(int argc, char** argv){
  	int16_t prevchar, nextchar;
 
