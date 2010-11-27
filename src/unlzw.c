@@ -72,12 +72,23 @@ void print_string(int16_t number){
 			exit(1);
 		}
 		print_string(dict[number][0]);
-		putchar(dict[number][1]);
+		print_string(dict[number][1]);
+	}
+	fflush(NULL);
+}
+
+void dict_fix(int16_t next_code){
+	if(dict_new <= DICT_SIZE){
+		if(next_code < 256)
+			dict[dict_new - 1][1] = next_code;
+		else
+			dict_fix(dict[next_code][0]);
 	}
 }
 
 int main(int argc, char** argv){
 	int16_t next_code;
+	int dict_new_;
 
 	fin = fopen("testoutput", "rb");
 	if(fin == NULL){
@@ -94,9 +105,8 @@ int main(int argc, char** argv){
 	print_string(next_code);
 	dict_add(next_code, -1);
 	while((next_code = get_code()) != EOF){
-		if(dict_new <= DICT_SIZE){
-			dict[dict_new - 1][1] = next_code;
-		}
+		dict_new_ = dict_new;
+		dict_fix(next_code);
 		print_string(next_code);
 		dict_add(next_code, -1);
 	}
