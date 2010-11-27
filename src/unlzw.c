@@ -62,7 +62,22 @@ int16_t get_code(){
 	return result;
 }
 
+void print_string(int16_t number){
+	if(number < 256){
+		putchar(number);
+	}
+	else{
+		if(dict[number] == NULL){
+			fprintf(stderr, "You failed\n");
+			exit(1);
+		}
+		print_string(dict[number][0]);
+		putchar(dict[number][1]);
+	}
+}
+
 int main(int argc, char** argv){
+	int16_t next_code;
 
 	fin = fopen("testoutput", "rb");
 	if(fin == NULL){
@@ -72,11 +87,19 @@ int main(int argc, char** argv){
 
 	dict_init();
 
-	putchar(get_code());
-	word_len++;
-	putchar(get_code());
-	putchar(get_code());
-	putchar(get_code());
+	if((next_code = get_code()) == EOF){
+		dict_free();
+		return 0;
+	}
+	print_string(next_code);
+	dict_add(next_code, -1);
+	while((next_code = get_code()) != EOF){
+		if(dict_new <= DICT_SIZE){
+			dict[dict_new - 1][1] = next_code;
+		}
+		print_string(next_code);
+		dict_add(next_code, -1);
+	}
 
 	dict_free();
 	fclose(fin);
