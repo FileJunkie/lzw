@@ -67,17 +67,35 @@ int16_t get_code(){
 		fprintf(stderr, "Got %d at %x and %x ", newchar, offset - 1, offset);
 		offset++;
 #endif
-		tail_len = 8 - (word_len - tail_len);
+		if(word_len - tail_len > 8){
+			tail_len = 16 - (word_len - tail_len);
+			newchar <<= (8 - tail_len);
+				for(i = 0; i < (8 - tail_len); i++){
+				newchar &= ~(1 << i);
+			}
+			result |= newchar;
+			if((newchar = getc(fin)) == EOF){
+				fprintf(stderr, "Bit alignment error\n");
+				exit(1);
+			}
+#ifdef DEBUG
+			fprintf(stderr, "and %x ", offset);
+			offset++;
+#endif
+		}
+		else{
+			tail_len = 8 - (word_len - tail_len);
+		}
 		tail = newchar;
 		for(i = 0; i < 16 - tail_len; i++){
 			tail &= ~(1 << (15 - i));
 		}
-
 		newchar >>= tail_len;
 		for(i = 0; i < 8 + tail_len; i++){
 			newchar &= ~(1 << (15 - i));
 		}
 		result |= newchar;
+
 #ifdef DEBUG
 		fprintf(stderr, "it is %d\n", result);
 #endif
