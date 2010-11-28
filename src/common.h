@@ -7,6 +7,7 @@
 
 #define CODE_LENGTH 12
 #define DICT_SIZE (1 << CODE_LENGTH)
+#define DEBUG
 
 #ifndef MAIN
 int16_t** dict;

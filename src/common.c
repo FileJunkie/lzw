@@ -45,9 +45,14 @@ void dict_add(int16_t c1, int16_t c2){
 	}
 	dict[dict_new][0] = c1;
 	dict[dict_new][1] = c2;
-
+#ifdef DEBUG
+	fprintf(stderr, "Added %d %d at %d\n", c1, c2, dict_new);
+#endif
 	if((dict_new & (dict_new -1)) == 0){
 		word_len++;
+#ifdef DEBUG
+		fprintf(stderr, "Word length is now %d\n", word_len);
+#endif
 	}
 	dict_new++;
 }
