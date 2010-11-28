@@ -64,7 +64,7 @@ int16_t get_code(){
 			exit(1);
 		}
 #ifdef DEBUG
-		fprintf(stderr, "Got %d at %x ", newchar, offset);
+		fprintf(stderr, "Got %d at %x and %x ", newchar, offset - 1, offset);
 		offset++;
 #endif
 		tail_len = 8 - (word_len - tail_len);

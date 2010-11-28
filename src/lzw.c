@@ -16,7 +16,7 @@ void print_code(int16_t code){
 		tempbyte |= (uint8_t)(code >> (word_len - 8 + tail_len));
 		putchar(tempbyte);
 #ifdef DEBUG
-		fprintf(stderr, "Written %d at %x as %x\n", code, offset, tempbyte);
+		fprintf(stderr, "Written %d at %x and %x as %x\n", code, offset, offset + 1, tempbyte);
 		offset++;
 #endif
 		cur_left -= 8 - tail_len;
@@ -32,8 +32,13 @@ void print_code(int16_t code){
 			tail_len = cur_left - 8;
 			putchar((uint8_t)(code >> tail_len));
 #ifdef DEBUG
-		fprintf(stderr, "Written %d at %x as %x\n", code, offset, (uint8_t)(code >> tail_len));
-		offset++;
+			if(tail_len == 0){
+				fprintf(stderr, "Written %d at %x as %x\n", code, offset, (uint8_t)(code >> tail_len));
+			}
+			else{
+				fprintf(stderr, "Written %d at %x and %x as %x\n", code, offset, offset + 1, (uint8_t)(code >> tail_len));
+			}
+				offset++;
 #endif
 			for(i = 0; i < 16 - tail_len; i++){
 				code &= ~(1 << (16 - i - 1));
@@ -45,11 +50,16 @@ void print_code(int16_t code){
 	else{
 		tempbyte = (uint8_t)(code >> (word_len - 8));
 		putchar(tempbyte);
+		tail_len = word_len - 8;
 #ifdef DEBUG
-		fprintf(stderr, "Written %d at %x as %x\n", code, offset, tempbyte);
+		if(tail_len == 0){
+			fprintf(stderr, "Written %d at %x as %x\n", code, offset, tempbyte);
+		}
+		else{
+			fprintf(stderr, "Written %d at %x and %x as %x\n", code, offset, offset + 1, tempbyte);
+		}
 		offset++;
 #endif
-		tail_len = word_len - 8;
 		if(word_len > 8){
 			for(i = 0; i < word_len - tail_len; i++){
 				code &= ~(1 << (word_len - i - 1));
@@ -78,11 +88,13 @@ int dict_search(int16_t c1, int16_t c2){
 int main(int argc, char** argv){
  	int16_t prevchar, nextchar;
  	int dict_pos;
+ 	int dict_new_;
 
 	dict_init();
 
  	prevchar = getchar();
  	while((nextchar = getchar()) != EOF){
+		dict_new_ = dict_new;
  		dict_pos = dict_search(prevchar, nextchar);
  		if(dict_pos == -1){ // string not found in dictionary. emit last one and add new
  			print_code(prevchar);
