@@ -88,13 +88,11 @@ int dict_search(int16_t c1, int16_t c2){
 int main(int argc, char** argv){
  	int16_t prevchar, nextchar;
  	int dict_pos;
- 	int dict_new_;
 
 	dict_init();
 
  	prevchar = getchar();
  	while((nextchar = getchar()) != EOF){
-		dict_new_ = dict_new;
  		dict_pos = dict_search(prevchar, nextchar);
  		if(dict_pos == -1){ // string not found in dictionary. emit last one and add new
  			print_code(prevchar);

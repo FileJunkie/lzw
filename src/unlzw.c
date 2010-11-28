@@ -2,8 +2,6 @@
 
 #include "common.h"
 
-FILE* fin;
-
 int16_t get_code(){
 	static uint8_t tail = 0, tail_len = 0;
 	int16_t result = 0;
@@ -13,7 +11,7 @@ int16_t get_code(){
 #endif
 
 	if(tail_len == 0){
-		if((newchar = getc(fin)) == EOF){
+		if((newchar = getchar()) == EOF){
 			return EOF;
 		}
 		if(word_len == 8){
@@ -30,9 +28,8 @@ int16_t get_code(){
 #endif
 			tail_len = 16 - word_len;
 			result = newchar << (8 - tail_len);
-			if((newchar = getc(fin)) == EOF){
-				fprintf(stderr, "Bit alignment error\n");
-				exit(1);
+			if((newchar = getchar()) == EOF){
+				return EOF;
 			}
 #ifdef DEBUG
 		fprintf(stderr, "and %d at %x ", newchar, offset);
@@ -59,9 +56,8 @@ int16_t get_code(){
 		for(i = 0; i < word_len - tail_len; i++){
 			result &= ~(1 << i);
 		}
-		if((newchar = getc(fin)) == EOF){
-			fprintf(stderr, "Bit alignment error\n");
-			exit(1);
+		if((newchar = getchar()) == EOF){
+			return EOF;
 		}
 #ifdef DEBUG
 		fprintf(stderr, "Got %d at %x and %x ", newchar, offset - 1, offset);
@@ -74,9 +70,8 @@ int16_t get_code(){
 				newchar &= ~(1 << i);
 			}
 			result |= newchar;
-			if((newchar = getc(fin)) == EOF){
-				fprintf(stderr, "Bit alignment error\n");
-				exit(1);
+			if((newchar = getchar()) == EOF){
+				return EOF;
 			}
 #ifdef DEBUG
 			fprintf(stderr, "and %x ", offset);
@@ -131,13 +126,6 @@ void dict_fix(int16_t next_code){
 
 int main(int argc, char** argv){
 	int16_t next_code;
-	int dict_new_;
-
-	fin = fopen("testoutput", "rb");
-	if(fin == NULL){
-		fprintf(stderr, "Cannot open file\n");
-		exit(1);
-	}
 
 	dict_init();
 
@@ -148,13 +136,11 @@ int main(int argc, char** argv){
 	print_string(next_code);
 	dict_add(next_code, -1);
 	while((next_code = get_code()) != EOF){
-		dict_new_ = dict_new;
 		dict_fix(next_code);
 		print_string(next_code);
 		dict_add(next_code, -1);
 	}
 
 	dict_free();
-	fclose(fin);
 	return 0;
 }

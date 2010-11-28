@@ -1,4 +1,7 @@
 Custom LZW implementation. University task.
 
 usage:
-./lzw < inputfile > outputfile 
+./lzw < inputfile > outputfile
+./unlzw < inputfile > outputfile
+
+Use test.sh for testing on sample text. 
