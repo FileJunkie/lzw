@@ -8,21 +8,36 @@ int16_t get_code(){
 	static uint8_t tail = 0, tail_len = 0;
 	int16_t result = 0;
 	int newchar, i;
+#ifdef DEBUG
+	static unsigned offset = 0;
+#endif
 
 	if(tail_len == 0){
 		if((newchar = getc(fin)) == EOF){
 			return EOF;
 		}
 		if(word_len == 8){
+#ifdef DEBUG
+		fprintf(stderr, "Got %d at %x, it is it\n", newchar, offset);
+		offset++;
+#endif
 			return newchar;
 		}
 		else{
+#ifdef DEBUG
+		fprintf(stderr, "Got %d at %x ", newchar, offset);
+		offset++;
+#endif
 			tail_len = 16 - word_len;
 			result = newchar << (8 - tail_len);
 			if((newchar = getc(fin)) == EOF){
 				fprintf(stderr, "Bit alignment error\n");
 				exit(1);
 			}
+#ifdef DEBUG
+		fprintf(stderr, "and %d at %x ", newchar, offset);
+		offset++;
+#endif
 			tail = newchar;
 			for(i = 0; i < 16 - tail_len; i++){
 				tail &= ~(1 << (15 - i));
@@ -33,6 +48,9 @@ int16_t get_code(){
 				newchar &= ~(1 << (15 - i));
 			}
 			result |= newchar;
+#ifdef DEBUG
+		fprintf(stderr, "it is %d\n", result);
+#endif
 			return result;
 		}
 	}
@@ -45,6 +63,10 @@ int16_t get_code(){
 			fprintf(stderr, "Bit alignment error\n");
 			exit(1);
 		}
+#ifdef DEBUG
+		fprintf(stderr, "Got %d at %x ", newchar, offset);
+		offset++;
+#endif
 		tail_len = 8 - (word_len - tail_len);
 		tail = newchar;
 		for(i = 0; i < 16 - tail_len; i++){
@@ -56,6 +78,9 @@ int16_t get_code(){
 			newchar &= ~(1 << (15 - i));
 		}
 		result |= newchar;
+#ifdef DEBUG
+		fprintf(stderr, "it is %d\n", result);
+#endif
 		return result;
 	}
 

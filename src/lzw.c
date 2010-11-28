@@ -6,12 +6,19 @@ uint8_t tail = 0, tail_len = 0;
 
 void print_code(int16_t code){
 	int cur_left = word_len, i;
+#ifdef DEBUG
+	static unsigned offset = 0;
+#endif
 	uint8_t tempbyte;
 
 	if(tail_len != 0){
 		tempbyte = tail << (8 - tail_len);
 		tempbyte |= (uint8_t)(code >> (word_len - 8 + tail_len));
 		putchar(tempbyte);
+#ifdef DEBUG
+		fprintf(stderr, "Written %d at %x as %x\n", code, offset, tempbyte);
+		offset++;
+#endif
 		cur_left -= 8 - tail_len;
 		if(cur_left < 8){
 			tail_len = cur_left;
@@ -24,6 +31,10 @@ void print_code(int16_t code){
 		else{
 			tail_len = cur_left - 8;
 			putchar((uint8_t)(code >> tail_len));
+#ifdef DEBUG
+		fprintf(stderr, "Written %d at %x as %x\n", code, offset, (uint8_t)(code >> tail_len));
+		offset++;
+#endif
 			for(i = 0; i < 16 - tail_len; i++){
 				code &= ~(1 << (16 - i - 1));
 			}
@@ -34,6 +45,10 @@ void print_code(int16_t code){
 	else{
 		tempbyte = (uint8_t)(code >> (word_len - 8));
 		putchar(tempbyte);
+#ifdef DEBUG
+		fprintf(stderr, "Written %d at %x as %x\n", code, offset, tempbyte);
+		offset++;
+#endif
 		tail_len = word_len - 8;
 		if(word_len > 8){
 			for(i = 0; i < word_len - tail_len; i++){
