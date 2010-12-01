@@ -14,7 +14,7 @@ void print_code(int16_t code){
 	if(tail_len != 0){
 		tempbyte = tail << (8 - tail_len);
 		tempbyte |= (uint8_t)(code >> (word_len - 8 + tail_len));
-		putchar(tempbyte);
+		putc(tempbyte, fout);
 #ifdef DEBUG
 		fprintf(stderr, "Written %d at %x and %x as %x\n", code, offset, offset + 1, tempbyte);
 		offset++;
@@ -30,7 +30,7 @@ void print_code(int16_t code){
 		}
 		else{
 			tail_len = cur_left - 8;
-			putchar((uint8_t)(code >> tail_len));
+			putc((uint8_t)(code >> tail_len), fout);
 #ifdef DEBUG
 			if(tail_len == 0){
 				fprintf(stderr, "Written %d at %x as %x\n", code, offset, (uint8_t)(code >> tail_len));
@@ -49,7 +49,7 @@ void print_code(int16_t code){
 	}
 	else{
 		tempbyte = (uint8_t)(code >> (word_len - 8));
-		putchar(tempbyte);
+		putc(tempbyte, fout);
 		tail_len = word_len - 8;
 #ifdef DEBUG
 		if(tail_len == 0){
@@ -70,7 +70,7 @@ void print_code(int16_t code){
 }
 
 void print_tail_finalize(){
-	putchar(tail << (8 - tail_len));
+	putc(tail << (8 - tail_len), fout);
 }
 
 int dict_search(int16_t c1, int16_t c2){
@@ -89,10 +89,25 @@ int main(int argc, char** argv){
  	int16_t prevchar, nextchar;
  	int dict_pos;
 
+
+#ifdef WIN32
+ 	if((fin = fopen("input_test", "rb")) == NULL){
+ 		fprintf(stderr, "Error opening input file\n");
+ 	}
+
+	if((fout = fopen("packed_test", "wb")) == NULL){
+ 		fprintf(stderr, "Error opening output file\n");
+ 	}
+
+#else
+	fin = stdin;
+	fout = stdout;
+#endif
+
 	dict_init();
 
- 	prevchar = getchar();
- 	while((nextchar = getchar()) != EOF){
+ 	prevchar = getc(fin);
+ 	while((nextchar = getc(fin)) != EOF){
  		dict_pos = dict_search(prevchar, nextchar);
  		if(dict_pos == -1){ // string not found in dictionary. emit last one and add new
  			print_code(prevchar);
@@ -107,5 +122,10 @@ int main(int argc, char** argv){
  	print_tail_finalize();
 
 	dict_free();
+
+#ifdef WIN32
+	fclose(fin);
+	fclose(fout);
+#endif
 	return 0;
 }

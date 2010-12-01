@@ -11,7 +11,7 @@ int16_t get_code(){
 #endif
 
 	if(tail_len == 0){
-		if((newchar = getchar()) == EOF){
+		if((newchar = getc(fin)) == EOF){
 			return EOF;
 		}
 		if(word_len == 8){
@@ -28,7 +28,7 @@ int16_t get_code(){
 #endif
 			tail_len = 16 - word_len;
 			result = newchar << (8 - tail_len);
-			if((newchar = getchar()) == EOF){
+			if((newchar = getc(fin)) == EOF){
 				return EOF;
 			}
 #ifdef DEBUG
@@ -56,7 +56,7 @@ int16_t get_code(){
 		for(i = 0; i < word_len - tail_len; i++){
 			result &= ~(1 << i);
 		}
-		if((newchar = getchar()) == EOF){
+		if((newchar = getc(fin)) == EOF){
 			return EOF;
 		}
 #ifdef DEBUG
@@ -70,7 +70,7 @@ int16_t get_code(){
 				newchar &= ~(1 << i);
 			}
 			result |= newchar;
-			if((newchar = getchar()) == EOF){
+			if((newchar = getc(fin)) == EOF){
 				return EOF;
 			}
 #ifdef DEBUG
@@ -102,7 +102,7 @@ int16_t get_code(){
 
 void print_string(int16_t number){
 	if(number < 256){
-		putchar(number);
+		putc(number, fout);
 	}
 	else{
 		if(dict[number] == NULL){
@@ -127,6 +127,15 @@ void dict_fix(int16_t next_code){
 int main(int argc, char** argv){
 	int16_t next_code;
 
+#ifdef WIN32
+ 	if(((fin = fopen("packed_test", "rb")) == NULL) || ((fout = fopen("unpacked_test", "wb")) == NULL)){
+ 		fprintf(stderr, "Error opening files\n");
+ 	}
+#else
+	fin = stdin;
+	fout = stdout;
+#endif
+
 	dict_init();
 
 	if((next_code = get_code()) == EOF){
@@ -142,5 +151,9 @@ int main(int argc, char** argv){
 	}
 
 	dict_free();
+#ifdef WIN32
+	fclose(fin);
+	fclose(fout);
+#endif
 	return 0;
 }

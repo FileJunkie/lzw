@@ -1,7 +1,9 @@
 Custom LZW implementation. University task.
 
 usage:
-./lzw < inputfile > outputfile
-./unlzw < inputfile > outputfile
+./bin/lzw < inputfile > outputfile
+./bin/unlzw < inputfile > outputfile
 
-Use test.sh for testing on sample text. 
+Use test.sh for testing on sample text.
+
+On Windows, input and output filenames are hard-coded. To test the programs, run test.bat. 
